@@ -26,7 +26,7 @@ server.route({
 });
 
 server.register([
-    require('./routes/app')
+    require('./routes/doctors'),require('./routes/patients'),require('./routes/watjainormal'),require('./routes/watjaialert')
 ], (err) => {
 
     if (err) {

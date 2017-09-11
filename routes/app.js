@@ -56,7 +56,9 @@ exports.register = function (server, options, next) {
     
     var year, month, day;
     var getDate;
-    getDate = new Date(Date.now()).toISOString();
+    getDate = new Date(Date.now());
+    getDate.setUTCHours(getDate.getUTCHours() + 7);
+    getDate = getDate.toISOString();
     console.log(getDate);
     getDate = getDate.substr(2, 8);
     year = getDate.substr(0, 2); 
@@ -92,8 +94,6 @@ exports.register = function (server, options, next) {
                 }
                 const doc = request.payload;
 
-                //Create an id
-                doc._id = uuid.v4();
                 doc.docId = genId;
 
                 db.Doctors.save(doc, (err, result) => {
@@ -213,7 +213,7 @@ exports.register = function (server, options, next) {
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
                 }
-
+                
                 reply(docs);
             });
 
@@ -226,9 +226,7 @@ exports.register = function (server, options, next) {
         path: '/patients/{patId}',
         handler: function (request, reply) {
 
-            db.Patients.find({
-                patId: request.params.patId
-            }, (err, doc) => {
+            db.Patients.aggregate([{ $lookup: { from: "Doctors", localField: "docId", foreignField: "docId", as: "Doctor"}}], (err, doc) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -238,7 +236,7 @@ exports.register = function (server, options, next) {
                     return reply(Boom.notFound());
                 }
 
-                reply(doc);
+                reply(doc[0]);
             });
 
         }
@@ -295,8 +293,7 @@ exports.register = function (server, options, next) {
 
                 const pat = request.payload;
                 const patt = request.payload;
-                //Create an id
-                pat._id = uuid.v4();
+
                 pat.birthDay = new Date(request.payload.birthDay);
                 pat.aaa = new Date()
                 pat.patId = genId;
@@ -360,18 +357,20 @@ exports.register = function (server, options, next) {
         config: {
             validate: {
                 payload: Joi.object({
-                    //patTitle: Joi.string().min(3).max(3),
+                    patId: Joi.string(),
+                    //patTitle: Joi.string().min(3).max(3).required(),
                     patFirstName: Joi.string().min(2).max(50),
                     patLastName: Joi.string().min(2).max(50),
-                    birthDay: Joi.date(),
+                    birthDay: Joi.string().min(10).max(10),
                     address: Joi.string().min(5).max(100),
                     subDistrict: Joi.string().min(2).max(50),
                     district: Joi.string().min(2).max(50),
                     province: Joi.string().min(2).max(50),
-                    postcode: Joi.number().min(5).max(5),
+                    postcode: Joi.string().min(5),
                     patTel: Joi.string().min(10).max(10),
                     bloodType: Joi.string().min(1).max(3),
                     underlyingDisease: Joi.string().min(2).max(100),
+                    docId: Joi.string().min(9).max(9),
                     patPic: Joi.string()
                 }).required().min(1)
             }
@@ -479,10 +478,9 @@ exports.register = function (server, options, next) {
                     genId = "MEN" + year + month + day + "00001";
                 }
                 const measurenorm = request.payload;
-
-                //Create an id
-                measurenorm._id = uuid.v4();
-                measurenorm.measureTime = new Date(Date.now()).toLocaleString();
+                var date = new Date(Date.now());
+                date.setUTCHours(date.getUTCHours() + 7);
+                measurenorm.measureTime = date;
                 measurenorm.measureId = genId;
 
                 db.WatjaiNormal.save(measurenorm, (err, result) => {
@@ -498,7 +496,8 @@ exports.register = function (server, options, next) {
         config: {
             validate: {
                 payload: {
-                    measureData: Joi.array().min(1).required()
+                    measureData: Joi.array().min(1).required(),
+                    patId: Joi.string().min(7).max(7).required()
                 }
             }
         }
@@ -636,10 +635,9 @@ exports.register = function (server, options, next) {
                     genId = "MEA" + year + month + day + "00001";
                 }
                 const measurealret = request.payload;
-
-                //Create an id
-                measurealret._id = uuid.v4();
-                measurealret.alertTime = new Date(Date.now()).toLocaleString();
+                var date = new Date(Date.now());
+                date.setUTCHours(date.getUTCHours() + 7);
+                measurealret.alertTime = date;
                 measurealret.alertId = genId;
                 db.WatjaiAlert.save(measurealret, (err, result) => {
 
