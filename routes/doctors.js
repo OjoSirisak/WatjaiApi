@@ -178,7 +178,7 @@
             handler: function (request, reply) {
                 db.Patients.find({
                     docId: request.params.docId
-                }, (err, docs) => {
+                }, { patId: 1, _id: 0, patFirstName: 1, patLastName: 1}, (err, docs) => {
 
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
