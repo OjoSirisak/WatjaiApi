@@ -174,7 +174,7 @@
 
         server.route({
             method: 'GET',
-            path: '/doctors/showpatients/{docId}',
+            path: '/doctors/{docId}/showpatients',
             handler: function (request, reply) {
                 db.Patients.find({
                     docId: request.params.docId
@@ -189,6 +189,29 @@
                     }
 
                     reply(docs);
+                });
+    
+            }
+        });
+
+        server.route({
+            method: 'GET',
+            path: '/doctors/{docId}/showpatients/{patId}',
+            handler: function (request, reply) {
+                db.Patients.find({
+                    docId: request.params.docId,
+                    patId: request.params.patId
+                }, (err, doc) => {
+
+                    if (err) {
+                        return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                    }
+
+                    if (!doc) {
+                        return reply(Boom.notFound());
+                    }
+
+                    reply(doc[0]);
                 });
     
             }

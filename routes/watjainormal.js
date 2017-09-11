@@ -28,22 +28,22 @@ exports.register = function (server, options, next) {
     // find by Measure Normal id
     server.route({
         method: 'GET',
-        path: '/watjainormal/{patId}',
+        path: '/watjainormal/{measureId}',
         handler: function (request, reply) {
 
             db.WatjaiNormal.find({
-                patId: request.params.patId
-            }, (err, doc) => {
-
+                measureId: request.params.measureId
+            }).sort({ measureTime : -1 } , (err, doc) => {
+                
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
                 }
-
+                
                 if (!doc) {
                     return reply(Boom.notFound());
                 }
-
-                reply(doc);
+                
+                    reply(doc);
             });
 
         }
