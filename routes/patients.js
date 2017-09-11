@@ -49,27 +49,6 @@
     });
 
 
-    // find with condition
-
-
-    server.route({
-        method: 'GET',
-        path: '/test',
-        handler: function (request, reply) {
-            db.Patients.find({}, { patId: 1, _id: 0 }).sort({ patId: -1 }).limit(1, (err, result) => {
-                if (err) {
-                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
-                }
-                const tmp = result;
-                reply(tmp);
-                console.log(tmp[0].patId);
-            })
-        }
-    });
-
-
-
-
     // create patient user
     server.route({
         method: 'POST',
@@ -236,6 +215,52 @@
                     reply().code(204);
                 });
             });
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/patients/{patId}/watjainormal/oldest',
+        handler: function (request, reply) {
+
+            db.WatjaiNormal.find({
+                patId: request.params.patId
+            }).sort({ measureTime : 1 } , (err, doc) => {
+                
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+                
+                if (!doc) {
+                    return reply(Boom.notFound());
+                }
+                
+                    reply(doc);
+            });
+
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/patients/{patId}/watjainormal/latest',
+        handler: function (request, reply) {
+
+            db.WatjaiNormal.find({
+                patId: request.params.patId
+            }).sort({ measureTime : -1 } , (err, doc) => {
+                
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+                
+                if (!doc) {
+                    return reply(Boom.notFound());
+                }
+                
+                    reply(doc);
+            });
+
         }
     });
 
