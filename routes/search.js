@@ -10,7 +10,7 @@ exports.register = function (server, options, next) {
     
     server.route({
         method: 'GET',
-        path: '/search/firstname/{patFirstName}/showpatients',
+        path: '/doctors/firstname/{patFirstName}/showpatients',
         handler: function (request, reply) {
             db.Patients.find({
                 patFirstName: request.params.patFirstName
@@ -32,7 +32,7 @@ exports.register = function (server, options, next) {
 
     server.route({
         method: 'GET',
-        path: '/search/lastname/{patLastName}/showpatients',
+        path: '/doctors/lastname/{patLastName}/showpatients',
         handler: function (request, reply) {
             db.Patients.find({
                 patLastName: request.params.patLastName

@@ -163,8 +163,6 @@
         config: {
             validate: {
                 payload: Joi.object({
-                    patId: Joi.string(),
-                    //patTitle: Joi.string().min(3).max(3).required(),
                     patFirstName: Joi.string().min(2).max(50),
                     patLastName: Joi.string().min(2).max(50),
                     birthDay: Joi.string().min(10).max(10),
@@ -172,7 +170,6 @@
                     subDistrict: Joi.string().min(2).max(50),
                     district: Joi.string().min(2).max(50),
                     province: Joi.string().min(2).max(50),
-                    postcode: Joi.string().min(5),
                     patTel: Joi.string().min(10).max(10),
                     bloodType: Joi.string().min(1).max(3),
                     underlyingDisease: Joi.string().min(2).max(100),
