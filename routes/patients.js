@@ -163,6 +163,7 @@
         config: {
             validate: {
                 payload: Joi.object({
+                    patId: Joi.string(),
                     patFirstName: Joi.string().min(2).max(50),
                     patLastName: Joi.string().min(2).max(50),
                     birthDay: Joi.string().min(10).max(10),
