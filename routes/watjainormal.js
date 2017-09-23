@@ -43,7 +43,7 @@ exports.register = function (server, options, next) {
                     return reply(Boom.notFound());
                 }
                 
-                    reply(doc);
+                reply(doc);
             });
 
         }
@@ -109,6 +109,30 @@ exports.register = function (server, options, next) {
                     patId: Joi.string().min(9).max(9).required()
                 }
             }
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/watjai/1hourago',
+        handler: function (request, reply) {
+            var getDate;
+            getDate = new Date(Date.now());
+            getDate.setUTCHours(getDate.getUTCHours() + 7 - 1);
+
+                db.WatjaiNormal.find({ "measureTime" : { $gt : new Date(getDate)}}, (err, result) => {
+                    if (err) {
+                        return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                    }
+                    
+                    if (!result) {
+                        return reply(Boom.notFound());
+                    }
+                    
+                        reply(result);
+                    
+                });
+
         }
     });
 
