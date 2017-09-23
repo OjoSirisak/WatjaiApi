@@ -92,7 +92,7 @@ exports.register = function (server, options, next) {
                 measurenorm.measureTime = date;
                 measurenorm.measureId = genId;
 
-                db.WatjaiNormal.save(measurenorm, (err, result) => {
+                db.WatjaiNormal.save(measurenorm, { unique: true },(err, result) => {
 
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
