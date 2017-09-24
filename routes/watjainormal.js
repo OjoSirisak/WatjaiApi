@@ -92,7 +92,7 @@ exports.register = function (server, options, next) {
                 measurenorm.measureTime = date;
                 measurenorm.measureId = genId;
 
-                db.WatjaiNormal.save(measurenorm, { unique: true },(err, result) => {
+                db.WatjaiNormal.save(measurenorm, (err, result) => {
 
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -114,13 +114,14 @@ exports.register = function (server, options, next) {
 
     server.route({
         method: 'GET',
-        path: '/watjai/1hourago',
+        path: '/watjai/{patId}/halfhour',
         handler: function (request, reply) {
             var getDate;
             getDate = new Date(Date.now());
-            getDate.setUTCHours(getDate.getUTCHours() + 7 - 1);
+            getDate.setUTCHours(getDate.getUTCHours() + 7);
+            getDate.setUTCMinutes(getDate.getUTCMinutes() - 30);
 
-                db.WatjaiNormal.find({ "measureTime" : { $gt : new Date(getDate)}}, (err, result) => {
+                db.WatjaiNormal.find({ "measureTime" : { $gt : new Date(getDate)}}).sort({ measureTime : 1 } , (err, result) => {
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
                     }
