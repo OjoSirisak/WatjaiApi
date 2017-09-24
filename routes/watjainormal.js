@@ -114,12 +114,12 @@ exports.register = function (server, options, next) {
 
     server.route({
         method: 'GET',
-        path: '/watjai/halfhour',
+        path: '/watjainormal/history/5minute',
         handler: function (request, reply) {
             var getDate;
             getDate = new Date(Date.now());
             getDate.setUTCHours(getDate.getUTCHours() + 7);
-            getDate.setUTCMinutes(getDate.getUTCMinutes() - 30);
+            getDate.setUTCMinutes(getDate.getUTCMinutes() - 5);
 
                 db.WatjaiNormal.find({ "measureTime" : { $gt : new Date(getDate)}}).sort({ measureTime : 1 } , (err, result) => {
                     if (err) {
