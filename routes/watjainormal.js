@@ -114,7 +114,7 @@ exports.register = function (server, options, next) {
 
     server.route({
         method: 'GET',
-        path: '/watjai/{patId}/halfhour',
+        path: '/watjai/halfhour',
         handler: function (request, reply) {
             var getDate;
             getDate = new Date(Date.now());
