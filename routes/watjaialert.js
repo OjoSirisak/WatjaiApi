@@ -10,10 +10,10 @@ exports.register = function (server, options, next) {
     
     server.route({
         method: 'GET',
-        path: '/watjaialert',
+        path: '/watjaimeasure',
         handler: function (request, reply) {
 
-            db.WatjaiAlert.find((err, docs) => {
+            db.WatjaiMeasure.find((err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -28,11 +28,11 @@ exports.register = function (server, options, next) {
     // find by Measure Alert id
     server.route({
         method: 'GET',
-        path: '/watjaialert/{measureAlertId}',
+        path: '/watjaimeasure/{measuringId}',
         handler: function (request, reply) {
 
-            db.WatjaiAlert.find({
-                alertId: request.params.measureAlertId
+            db.WatjaiMeasure.find({
+                measuringId: request.params.measuringId
             }, (err, doc) => {
 
                 if (err) {
@@ -52,16 +52,25 @@ exports.register = function (server, options, next) {
     // create Wat jai Measure Alert
     server.route({
         method: 'POST',
-        path: '/watjaialert',
+        path: '/watjaimeasure',
         handler: function (request, reply) {
             var number, genId, checkYear, checkMonth, checkDay;
-            db.WatjaiAlert.find({}, { alertId: 1, _id: 0 }).sort({ alertId: -1 }).limit(1, (err, result) => {
+            var year, month, day;
+            var getDate;
+            getDate = new Date(Date.now());
+            getDate.setUTCHours(getDate.getUTCHours() + 7);
+            getDate = getDate.toISOString();
+            getDate = getDate.substr(2, 8);
+            year = getDate.substr(0, 2); 
+            month = getDate.substr(3, 2);
+            day = getDate.substr(6, 2);
+            db.WatjaiMeasure.find({}, { measuringId: 1, _id: 0 }).sort({ measuringId: -1 }).limit(1, (err, result) => {
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
                 }
                 const tmp = result;
                 if (tmp[0] != null) {
-                    var getId = tmp[0].alertId + "";
+                    var getId = tmp[0].measuringId + "";
                     var getNumber = getId.substr(2, 11);
                     checkYear = getId.substr(2, 2);
                     checkMonth = getId.substr(4, 2);
@@ -69,34 +78,81 @@ exports.register = function (server, options, next) {
                     if (year == checkYear && month == checkMonth && day == checkDay) {
                         number = parseInt(getNumber);
                         number = number + 1;
-                        genId = "AL" + number;
+                        genId = "ME" + number;
                     } else {
-                        genId = "AL" + year + month + day + "00001";
+                        genId = "ME" + year + month + day + "00001";
                     }
                 } else {
-                    genId = "AL" + year + month + day + "00001";
+                    genId = "ME" + year + month + day + "00001";
                 }
-                const measurealret = request.payload;
+                const measuring = request.payload;
                 var date = new Date(Date.now());
                 date.setUTCHours(date.getUTCHours() + 7);
-                measurealret.alertTime = date;
-                measurealret.alertId = genId;
-                db.WatjaiAlert.save(measurealret, (err, result) => {
+                measuring.alertTime = date;
+                measuring.measuringId = genId;
+                db.WatjaiMeasure.save(measuring, (err, result) => {
 
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
                     }
 
-                    reply(measurealret);
+                    reply(measuring);
                 });
             })
         },
         config: {
             validate: {
                 payload: {
-                    alertData: Joi.array().min(1).required(),
+                    measuringData: Joi.array().min(1).required(),
+                    abnormalStatus: Joi.boolean().required(),
+                    patId: Joi.string().min(9).max(9).required()
                 }
             }
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/watjaimeasure/showabnormal',
+        handler: function (request, reply) {
+            db.WatjaiMeasure.find({
+                "abnormalStatus" : false 
+            }, (err, docs) => {
+
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+
+                if (!docs) {
+                    return reply(Boom.notFound());
+                }
+
+                reply(docs);
+            });
+
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/watjaimeasure/showabnormal/{patId}',
+        handler: function (request, reply) {
+            db.WatjaiMeasure.find({
+                patId: request.params.patId,
+                "abnormalStatus" : false 
+            }, (err, docs) => {
+
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+
+                if (!docs) {
+                    return reply(Boom.notFound());
+                }
+
+                reply(docs);
+            });
+
         }
     });
 

@@ -79,12 +79,12 @@ exports.register = function (server, options, next) {
                     if (year == checkYear && month == checkMonth && day == checkDay) {
                         number = parseInt(getNumber);
                         number = number + 1;
-                        genId = "ME" + number;
+                        genId = "NM" + number;
                     } else {
-                        genId = "ME" + year + month + day + "00001";
+                        genId = "NM" + year + month + day + "00001";
                     }
                 } else {
-                    genId = "ME" + year + month + day + "00001";
+                    genId = "NM" + year + month + day + "00001";
                 }
                 const measurenorm = request.payload;
                 var date = new Date(Date.now());
@@ -114,14 +114,14 @@ exports.register = function (server, options, next) {
 
     server.route({
         method: 'GET',
-        path: '/watjainormal/history/5minute',
+        path: '/watjainormal/{patId}/history/5minute',
         handler: function (request, reply) {
             var getDate;
             getDate = new Date(Date.now());
             getDate.setUTCHours(getDate.getUTCHours() + 7);
             getDate.setUTCMinutes(getDate.getUTCMinutes() - 5);
 
-                db.WatjaiNormal.find({ "measureTime" : { $gt : new Date(getDate)}}).sort({ measureTime : 1 } , (err, result) => {
+                db.WatjaiNormal.find({ "measureTime" : { $gt : new Date(getDate)}, patId: request.params.patId}).sort({ measureTime : 1 } , (err, result) => {
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
                     }

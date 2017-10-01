@@ -262,6 +262,29 @@
         }
     });
 
+    server.route({
+        method: 'GET',
+        path: '/patients/{patId}/watjainormal/lastecg',
+        handler: function (request, reply) {
+
+            db.WatjaiNormal.find({
+                patId: request.params.patId
+            }).sort({ measureTime : -1 } , (err, doc) => {
+                
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+                
+                if (!doc) {
+                    return reply(Boom.notFound());
+                }
+                
+                    reply(doc[0]);
+            });
+
+        }
+    });
+
         return next();
     };
 
