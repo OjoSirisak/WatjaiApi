@@ -166,6 +166,7 @@
                     patId: Joi.string(),
                     patFirstName: Joi.string().min(2).max(50),
                     patLastName: Joi.string().min(2).max(50),
+                    sex: Joi.string().required(),
                     birthDay: Joi.string().min(10).max(10),
                     address: Joi.string().min(5).max(100),
                     subDistrict: Joi.string().min(2).max(50),
