@@ -158,6 +158,29 @@ exports.register = function (server, options, next) {
 
     server.route({
         method: 'GET',
+        path: '/watjaimeasure/showabnormal/{patId}/after/',
+        handler: function (request, reply) {
+            db.WatjaiMeasure.find({
+                patId: request.params.patId,
+                "abnormalStatus" : false
+            }, (err, docs) => {
+
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+
+                if (!docs) {
+                    return reply(Boom.notFound());
+                }
+
+                reply(docs);
+            });
+
+        }
+    });
+
+    server.route({
+        method: 'GET',
         path: '/watjaimeasure/showabnormal/{patId}/after/{measuringId}',
         handler: function (request, reply) {
             db.WatjaiMeasure.find({
