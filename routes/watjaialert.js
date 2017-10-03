@@ -104,6 +104,7 @@ exports.register = function (server, options, next) {
             validate: {
                 payload: {
                     measuringData: Joi.array().min(1).required(),
+                    heartRate: Joi.number().required(),
                     abnormalStatus: Joi.boolean().required(),
                     patId: Joi.string().min(9).max(9).required()
                 }
