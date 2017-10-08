@@ -118,7 +118,7 @@ exports.register = function (server, options, next) {
         handler: function (request, reply) {
             db.WatjaiMeasure.find({
                 "abnormalStatus" : false 
-            }, (err, docs) => {
+            }).sort({ alertTime : 1 }, (err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -141,7 +141,7 @@ exports.register = function (server, options, next) {
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
                 "abnormalStatus" : false 
-            }, (err, docs) => {
+            }).sort({ alertTime : 1 }, (err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -164,7 +164,7 @@ exports.register = function (server, options, next) {
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
                 "abnormalStatus" : false
-            }, (err, docs) => {
+            }).sort({ alertTime : 1 }, (err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -188,7 +188,7 @@ exports.register = function (server, options, next) {
                 patId: request.params.patId,
                 "abnormalStatus" : false,
                 "measuringId" : { $gt : request.params.measuringId }
-            }, (err, docs) => {
+            }).sort({ alertTime : 1 }, (err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
