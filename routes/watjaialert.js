@@ -163,7 +163,7 @@ exports.register = function (server, options, next) {
         handler: function (request, reply) {
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
-                "abnormalStatus" : false
+                "comment" : {"$exists" : true, "$ne" : ""}
             }).sort({ alertTime : -1 }, (err, docs) => {
 
                 if (err) {
@@ -186,7 +186,7 @@ exports.register = function (server, options, next) {
         handler: function (request, reply) {
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
-                "abnormalStatus" : false,
+                "comment" : {"$exists" : true, "$ne" : ""},
                 "measuringId" : { $gt : request.params.measuringId }
             }).sort({ alertTime : -1 }, (err, docs) => {
 
@@ -203,6 +203,42 @@ exports.register = function (server, options, next) {
 
         }
     });
+
+    server.route({
+        method: 'PATCH',
+        path: '/watjaimeasure/{measuringId}',
+        handler: function (request, reply) {
+
+            db.WatjaiMeasure.update({
+                measuringId: request.params.measuringId
+            }, {
+                    $set: request.payload
+                }, function (err, result) {
+
+                    if (err) {
+                        return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                    }
+
+                    if (result.n === 0) {
+                        return reply(Boom.notFound());
+                    }
+
+                    reply().code(204);
+                });
+        },
+        config: {
+            validate: {
+                payload: Joi.object({
+                    measuringData: Joi.array().min(1).required(),
+                    heartRate: Joi.number().required(),
+                    abnormalStatus: Joi.boolean().required(),
+                    comment: Joi.string().min(10),
+                    patId: Joi.string().min(9).max(9).required()
+                }).required().min(1)
+            }
+        }
+    });
+
 
     return next();
 };
