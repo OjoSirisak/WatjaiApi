@@ -229,6 +229,7 @@ exports.register = function (server, options, next) {
         config: {
             validate: {
                 payload: Joi.object({
+                    measuringId: Joi.string(),
                     measuringData: Joi.array().min(1).required(),
                     heartRate: Joi.number().required(),
                     abnormalStatus: Joi.boolean().required(),
