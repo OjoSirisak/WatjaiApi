@@ -229,8 +229,9 @@ exports.register = function (server, options, next) {
         config: {
             validate: {
                 payload: Joi.object({
-                    abnormalStatus: Joi.boolean().required(),
-                    comment: Joi.string().min(10)
+                    abnormalStatus: Joi.boolean(),
+                    comment: Joi.string().min(5),
+                    alertTime: Joi.date()
                 }).required().min(1)
             }
         }
