@@ -3,6 +3,8 @@
 const Boom = require('boom');
 const uuid = require('node-uuid');
 const Joi = require('joi');
+const onesignal = require('node-opensignal-api');
+const onesignal_client = onesignal.createClient();
 
 exports.register = function (server, options, next) {
 
@@ -208,23 +210,50 @@ exports.register = function (server, options, next) {
         method: 'PATCH',
         path: '/watjaimeasure/{measuringId}',
         handler: function (request, reply) {
-
-            db.WatjaiMeasure.update({
+            let patId;
+            db.WatjaiMeasure.find({
                 measuringId: request.params.measuringId
-            }, {
+            }, (err, doc) => {
+
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+
+                if (!doc) {
+                    return reply(Boom.notFound());
+                }
+                patId = doc[0].patId;
+                db.WatjaiMeasure.update({
+                    measuringId: request.params.measuringId
+                }, {
                     $set: request.payload
                 }, function (err, result) {
-
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
                     }
-
                     if (result.n === 0) {
                         return reply(Boom.notFound());
                     }
-
                     reply().code(204);
                 });
+                console.log(patId);
+                var restApiKey = 'NTAwZWM1OWMtZjhjNS00YTc4LTk5OTgtODVjYjNhOGZhNmE4';
+                var params = {
+                    app_id: '3b2a8959-e726-41d4-b83d-82c965cfabe1',
+                    contents: {
+                        'en': request.payload.comment,
+                        'th': request.payload.comment
+                    },
+                    tags: [{ "key": "patId", "relation": "=", "value": patId}]
+                };
+                onesignal_client.notifications.create(restApiKey, params, function (err, response) {
+                    if (err) {
+                        console.log('Encountered error', err);
+                      } else {
+                        console.log(response);
+                      }
+                });
+            });
         },
         config: {
             validate: {
