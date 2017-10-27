@@ -122,6 +122,7 @@
                 payload: {
                     patFirstName: Joi.string().min(2).max(50).required(),
                     patLastName: Joi.string().min(2).max(50).required(),
+                    sex: Joi.string().required(),
                     birthDay: Joi.string().min(10).max(10).required(),
                     address: Joi.string().min(5).max(100).required(),
                     subDistrict: Joi.string().min(2).max(50).required(),
