@@ -236,6 +236,7 @@ exports.register = function (server, options, next) {
                     }
                     reply().code(204);
                 });
+                console.log(patId);
                 var restApiKey = 'NTAwZWM1OWMtZjhjNS00YTc4LTk5OTgtODVjYjNhOGZhNmE4';
                 var params = {
                     app_id: '3b2a8959-e726-41d4-b83d-82c965cfabe1',
@@ -265,29 +266,6 @@ exports.register = function (server, options, next) {
         }
     });
 
-    server.route({
-        method: 'PATCH',
-        path: '/watjaimeasure/changereadstatus/{measuringId}',
-        handler: function (request, reply) {
-
-            db.WatjaiMeasure.update({
-                measuringId: request.params.measuringId
-            }, {
-                    status: "read"
-                }, function (err, result) {
-
-                    if (err) {
-                        return reply(Boom.wrap(err, 'Internal MongoDB error'));
-                    }
-
-                    if (result.n === 0) {
-                        return reply(Boom.notFound());
-                    }
-
-                    reply().code(204);
-                });
-        }
-    });
 
     return next();
 };
