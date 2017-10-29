@@ -226,8 +226,7 @@ exports.register = function (server, options, next) {
                 db.WatjaiMeasure.update({
                     measuringId: request.params.measuringId
                 }, {
-                    $set: request.payload,
-                    status: "unread"
+                    $set: request.payload
                 }, function (err, result) {
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
