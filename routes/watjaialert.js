@@ -292,6 +292,7 @@ exports.register = function (server, options, next) {
         config: {
             validate: {
                 payload: Joi.object({
+                    measuringId: Joi.string(),
                     readStatus: Joi.string()
                 }).required().min(1)
             }
