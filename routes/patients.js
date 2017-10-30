@@ -129,7 +129,7 @@
                     district: Joi.string().min(2).max(50).required(),
                     province: Joi.string().min(2).max(50).required(),
                     patTel: Joi.string().min(10).max(10).required(),
-                    bloodType: Joi.string().min(1).max(3).required(),
+                    bloodType: Joi.string().required(),
                     underlyingDisease: Joi.string().min(2).max(100),
                     docId: Joi.string().min(9).max(9).required(),
                     patPic: Joi.string()
