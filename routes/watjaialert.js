@@ -260,12 +260,43 @@ exports.register = function (server, options, next) {
                 payload: Joi.object({
                     abnormalStatus: Joi.boolean(),
                     comment: Joi.string().min(5),
-                    alertTime: Joi.date()
+                    alertTime: Joi.date(),
+                    readStatus: Joi.string()
                 }).required().min(1)
             }
         }
     });
 
+    server.route({
+        method: 'PATCH',
+        path: '/watjaimeasure/changereadstatus/{measuringId}',
+        handler: function (request, reply) {
+
+            db.WatjaiMeasure.update({
+                measuringId: request.params.measuringId
+            }, {
+                    $set: request.payload
+                }, function (err, result) {
+
+                    if (err) {
+                        return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                    }
+
+                    if (result.n === 0) {
+                        return reply(Boom.notFound());
+                    }
+
+                    reply().code(204);
+                });
+        },
+        config: {
+            validate: {
+                payload: Joi.object({
+                    readStatus: Joi.string()
+                }).required().min(1)
+            }
+        }
+    });
 
     return next();
 };
