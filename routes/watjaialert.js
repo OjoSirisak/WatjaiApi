@@ -51,69 +51,6 @@ exports.register = function (server, options, next) {
         }
     });
 
-    // create Wat jai Measure Alert
-    server.route({
-        method: 'POST',
-        path: '/watjaimeasure',
-        handler: function (request, reply) {
-            var number, genId, checkYear, checkMonth, checkDay;
-            var year, month, day;
-            var getDate;
-            getDate = new Date(Date.now());
-            getDate.setUTCHours(getDate.getUTCHours() + 7);
-            getDate = getDate.toISOString();
-            getDate = getDate.substr(2, 8);
-            year = getDate.substr(0, 2); 
-            month = getDate.substr(3, 2);
-            day = getDate.substr(6, 2);
-            db.WatjaiMeasure.find({}, { measuringId: 1, _id: 0 }).sort({ measuringId: -1 }).limit(1, (err, result) => {
-                if (err) {
-                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
-                }
-                const tmp = result;
-                if (tmp[0] != null) {
-                    var getId = tmp[0].measuringId + "";
-                    var getNumber = getId.substr(2, 11);
-                    checkYear = getId.substr(2, 2);
-                    checkMonth = getId.substr(4, 2);
-                    checkDay = getId.substr(6, 2);
-                    if (year == checkYear && month == checkMonth && day == checkDay) {
-                        number = parseInt(getNumber);
-                        number = number + 1;
-                        genId = "ME" + number;
-                    } else {
-                        genId = "ME" + year + month + day + "00001";
-                    }
-                } else {
-                    genId = "ME" + year + month + day + "00001";
-                }
-                const measuring = request.payload;
-                var date = new Date(Date.now());
-                date.setUTCHours(date.getUTCHours() + 7);
-                measuring.alertTime = date;
-                measuring.measuringId = genId;
-                db.WatjaiMeasure.save(measuring, (err, result) => {
-
-                    if (err) {
-                        return reply(Boom.wrap(err, 'Internal MongoDB error'));
-                    }
-
-                    reply(measuring);
-                });
-            })
-        },
-        config: {
-            validate: {
-                payload: {
-                    measuringData: Joi.array().min(1).required(),
-                    heartRate: Joi.number().required(),
-                    abnormalStatus: Joi.boolean().required(),
-                    patId: Joi.string().min(9).max(9).required()
-                }
-            }
-        }
-    });
-
     server.route({
         method: 'GET',
         path: '/watjaimeasure/showabnormal',

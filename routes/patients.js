@@ -287,6 +287,75 @@
         }
     });
 
+    server.route({
+        method: 'GET',
+        path: '/patients/{patId}/watjaimeasure/oldest',
+        handler: function (request, reply) {
+
+            db.WatjaiMeasure.find({
+                patId: request.params.patId
+            }).sort({ alertTime : 1 } , (err, doc) => {
+                
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+                
+                if (!doc) {
+                    return reply(Boom.notFound());
+                }
+                
+                    reply(doc);
+            });
+
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/patients/{patId}/watjaimeasure/latest',
+        handler: function (request, reply) {
+
+            db.WatjaiMeasure.find({
+                patId: request.params.patId
+            }).sort({ alertTime : -1 } , (err, doc) => {
+                
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+                
+                if (!doc) {
+                    return reply(Boom.notFound());
+                }
+                
+                    reply(doc);
+            });
+
+        }
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/patients/{patId}/watjaimeasure/lastecg',
+        handler: function (request, reply) {
+
+            db.WatjaiMeasure.find({
+                patId: request.params.patId
+            }).sort({ alertTime : -1 } , (err, doc) => {
+                
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+                
+                if (!doc) {
+                    return reply(Boom.notFound());
+                }
+                
+                    reply(doc[0]);
+            });
+
+        }
+    });
+
         return next();
     };
 
