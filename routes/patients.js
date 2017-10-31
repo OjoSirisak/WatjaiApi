@@ -132,6 +132,7 @@
                     bloodType: Joi.string().required(),
                     underlyingDisease: Joi.string().min(2).max(100),
                     docId: Joi.string().min(9).max(9).required(),
+                    password: Joi.string().min(3),
                     patPic: Joi.string()
                 }
             }

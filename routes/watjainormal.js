@@ -119,7 +119,7 @@ exports.register = function (server, options, next) {
             var getDate;
             getDate = new Date(Date.now());
             getDate.setUTCHours(getDate.getUTCHours() + 7);
-            getDate.setUTCMinutes(getDate.getUTCMinutes() - 5);
+            getDate.setUTCMinutes(getDate.getUTCMinutes() - 1);
 
                 db.WatjaiNormal.find({ "measureTime" : { $gt : new Date(getDate)}, patId: request.params.patId}).sort({ measureTime : 1 } , (err, result) => {
                     if (err) {

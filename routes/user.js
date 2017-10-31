@@ -8,13 +8,12 @@
 
         const db = server.app.db;
 
-         // find everything in collection
         server.route({
             method: 'GET',
-            path: '/doctors',
+            path: '/user',
             handler: function (request, reply) {
 
-                db.Doctors.find((err, docs) => {
+                db.User.find((err, docs) => {
 
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -26,10 +25,9 @@
             }
         });
 
-        // find by doctor id
         server.route({
             method: 'GET',
-            path: '/doctors/{docId}',
+            path: '/user/{id}',
             handler: function (request, reply) {
 
                 db.Doctors.find({
@@ -50,63 +48,27 @@
             }
         });
 
-        // create doctor user
         server.route({
             method: 'POST',
-            path: '/doctors',
+            path: '/user',
             handler: function (request, reply) {
-                var number, genId, checkYear, checkMonth;
-                var year, month, day;
-                var getDate;
-                getDate = new Date(Date.now());
-                getDate.setUTCHours(getDate.getUTCHours() + 7);
-                getDate = getDate.toISOString();
-                getDate = getDate.substr(2, 8);
-                year = getDate.substr(0, 2); 
-                month = getDate.substr(3, 2);
-                day = getDate.substr(6, 2);
-                db.Doctors.find({}, { docId: 1, _id: 0 }).sort({ docId: -1 }).limit(1, (err, result) => {
-                    if (err) {
-                        return reply(Boom.wrap(err, 'Internal MongoDB error'));
-                    }
-                    const tmp = result;
-                    if (tmp[0] != null) {
-                        var getDocId = tmp[0].docId + "";
-                        var getNumber = getDocId.substr(2, 7);
-                        checkYear = getDocId.substr(2, 2);
-                        checkMonth = getDocId.substr(4, 2);
-                        if (year == checkYear && month == checkMonth) {
-                            number = parseInt(getNumber);
-                            number = number + 1;
-                            genId = "DO" + number;
-                        } else {
-                            genId = "DO" + year + month + "001";
-                        }
-                    } else {
-                        genId = "DO" + year + month + "001";
-                    }
-                    const doc = request.payload;
-
-                    doc.docId = genId;
-
-                    db.Doctors.save(doc, (err, result) => {
+                    const user = request.payload;
+                    db.User.save(user, (err, result) => {
 
                         if (err) {
                             return reply(Boom.wrap(err, 'Internal MongoDB error'));
                         }
 
-                        reply(doc);
+                        reply(user);
                     });
-                })
+            
             },
             config: {
                 validate: {
                     payload: {
-                        docTitle: Joi.string().min(3).max(3).required(),
-                        docFirstName: Joi.string().min(2).max(50).required(),
-                        docLastName: Joi.string().min(2).max(50).required(),
-                        docTel: Joi.string().min(10).max(10).required(),
-                        docPic: Joi.string()
+                        tel: Joi.string().min(10).max(10).required(),
+                        password: Joi.string().required(),
+                        id: Joi.string().required()
                     }
                 }
             }
@@ -115,11 +77,11 @@
         // update doctor user
         server.route({
             method: 'PATCH',
-            path: '/doctors/{docId}',
+            path: '/user/{id}',
             handler: function (request, reply) {
 
-                db.Doctors.update({
-                    docId: request.params.docId
+                db.User.update({
+                    id: request.params.id
                 }, {
                         $set: request.payload
                     }, function (err, result) {
@@ -138,12 +100,9 @@
             config: {
                 validate: {
                     payload: Joi.object({
-                        docTitle: Joi.string().min(3).max(3),
-                        docFirstName: Joi.string().min(2).max(50),
-                        docLastName: Joi.string().min(2).max(50),
-                        docTel: Joi.string().min(10).max(10),
-                        docPic: Joi.string(),
-                        patients: Joi.array()
+                        tel: Joi.string().min(10).max(10).required(),
+                        password: Joi.string().required(),
+                        id: Joi.string().required()
                     }).required().min(1)
                 }
             }
@@ -152,11 +111,11 @@
         // delete doctor user by doctor id
         server.route({
             method: 'DELETE',
-            path: '/doctors/{docId}',
+            path: '/user/{id}',
             handler: function (request, reply) {
 
-                db.Doctors.remove({
-                    docId: request.params.docId
+                db.User.remove({
+                    id: request.params.id
                 }, function (err, result) {
 
                     if (err) {
@@ -217,6 +176,48 @@
             }
         });
 
+        server.route({
+            method: 'POST',
+            path: '/checkuser',
+            handler: function (request, reply) {
+                    var user = request.payload.tel;
+                    var password = request.payload.password;
+                    var success;
+                    var status;
+                    db.User.find(user, (err, result) => {
+
+                        if (err) {
+                            return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                        }
+
+                        var data = result;
+                        if (data[0] != null) {
+                            let data_pass = data.password;
+                            if  (data_pass == password) {
+                                success = true;
+                                status = "เข้าสู่ระบบ";
+                            } else {
+                                success = false;
+                                status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
+                            }
+                        } else {
+                            success = false
+                            status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
+                        }
+
+                        reply( {"success" : success, "status" : status } );
+                    });
+            
+            },
+            config: {
+                validate: {
+                    payload: {
+                        tel: Joi.string().min(10).max(10).required(),
+                        password: Joi.string().required()
+                    }
+                }
+            }
+        });
 
         return next();
     };

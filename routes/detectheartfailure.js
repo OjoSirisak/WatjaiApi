@@ -795,7 +795,9 @@ exports.register = function (server, options, next) {
             if(fid_pandt > 0){
                 fid_pt_pandt_time = time_buff[(fid_pandt)%WIND];
                 rr_int = fid_pt_pandt_time-last_fid_time;
-                heart_rate = 60.0/rr_int;
+                if (rr_int != 0) {
+                    heart_rate = 60.0/rr_int;
+                }
                 
                 //collect 8 most recent Beat.
                 rrAvg[countBeat] = rr_int*1000;
@@ -926,24 +928,20 @@ exports.register = function (server, options, next) {
                 date.setUTCHours(date.getUTCHours() + 7);
                 measuring.alertTime = date;
                 measuring.measuringId = genId;
-                measuring.heartRate = heart_rate;
-
+                var measuringData = request.payload.measuringData;
+                initialise();
+                var detecting = get_result(measuringData);
+                measuring.heartRate = parseInt(heart_rate);
+                
                 if (abnormal_status == false) {
                     measuring.abnormalStatus = abnormal_status;
                     measuring.abnormalDetail = abnormal_detail;
                 }
-
-                var measuringData = request.payload.measuringData;
-                
-                initialise();
-                var detecting = get_result(measuringData);
                 db.WatjaiMeasure.save(measuring, (err, result) => {
 
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
                     }
-
-                    reply(measuring);
                 });
             })
         },
