@@ -943,6 +943,9 @@ exports.register = function (server, options, next) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
                     }
                 });
+
+                reply({"status": true});
+                db.close();
             })
         },
         config: {
