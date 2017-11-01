@@ -931,6 +931,7 @@ exports.register = function (server, options, next) {
                 var measuringData = request.payload.measuringData;
                 initialise();
                 var detecting = get_result(measuringData);
+                
                 measuring.heartRate = parseInt(heart_rate);
                 
                 if (abnormal_status == false) {
