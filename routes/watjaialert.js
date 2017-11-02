@@ -183,13 +183,15 @@ exports.register = function (server, options, next) {
                     },
                     tags: [{ "key": "patId", "relation": "=", "value": patId}]
                 };
-                onesignal_client.notifications.create(restApiKey, params, function (err, response) {
-                    if (err) {
-                        console.log('Encountered error', err);
-                      } else {
-                        console.log(response);
-                      }
-                });
+                if (request.payload.comment != "") {
+                    onesignal_client.notifications.create(restApiKey, params, function (err, response) {
+                        if (err) {
+                            console.log('Encountered error', err);
+                          } else {
+                            console.log(response);
+                          }
+                    });
+                }
             });
         },
         config: {
