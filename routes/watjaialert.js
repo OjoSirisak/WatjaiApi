@@ -263,6 +263,7 @@ exports.register = function (server, options, next) {
                             console.log('Encountered error', err);
                           } else {
                             console.log(response);
+                            reply({ status : true});
                           }
                     });
         },
