@@ -245,6 +245,36 @@ exports.register = function (server, options, next) {
         }
     });
 
+    server.route({
+        method: 'POST',
+        path: '/onesignal',
+        handler: function (request, reply) {
+                var restApiKey = 'MDg1N2FmMWItZTg3Ni00MzllLWFjNjUtYjhkZDI0ODBjOGVj';
+                var params = {
+                    app_id: 'e714205d-ffd3-4182-8dbb-29c68d32ed2a',
+                    contents: {
+                        'en': request.payload.test,
+                        'th': request.payload.test
+                    },
+                    tags: [{ "key": "test_tag", "relation": "=", "value": "tag001"}]
+                };
+                    onesignal_client.notifications.create(restApiKey, params, function (err, response) {
+                        if (err) {
+                            console.log('Encountered error', err);
+                          } else {
+                            console.log(response);
+                          }
+                    });
+        },
+        config: {
+            validate: {
+                payload: Joi.object({
+                    test: Joi.string()
+                })
+            }
+        }
+    });
+
     return next();
 };
 
