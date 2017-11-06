@@ -27,7 +27,7 @@ server.route({
 });
 
 server.register([
-    require('./routes/doctors'),require('./routes/patients'),require('./routes/watjainormal'),require('./routes/watjaialert'),require('./routes/search'),require('./routes/detectheartfailure')
+    require('./routes/doctors'),require('./routes/patients'),require('./routes/watjainormal'),require('./routes/watjaialert'),require('./routes/search'),require('./routes/detectheartfailure'),require('./routes/user')
 ], (err) => {
 
     if (err) {
