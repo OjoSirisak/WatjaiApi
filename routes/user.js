@@ -15,9 +15,7 @@
                 var username = request.payload.username;
                 var password = request.payload.password;
                 username = username.toUpperCase();
-                var success;
-                var status;
-
+                var success, status, id;
                 db.Patients.find({
                     patId: username
                 }, (err, result) => {
@@ -36,16 +34,19 @@
                         if  (data_pass == password) {
                             success = true;
                             status = "เข้าสู่ระบบ";
+                            id = data.patId;
                         } else {
                             success = false;
                             status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
+                            id = null;
                         }
                     } else {
                         success = false
                         status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
+                        id = null
                     }
 
-                    reply( {"success" : success, "status" : status , "patId" : data.patId} );
+                    reply( {"success" : success, "status" : status , "patId" : id} );
                 });
             
             },
@@ -66,8 +67,7 @@
                 var username = request.payload.username;
                 var password = request.payload.password;
                 username = username.toUpperCase();
-                var success;
-                var status;
+                var success, status, id;
 
                 db.Doctors.find({
                     docId: username
@@ -87,16 +87,19 @@
                         if  (data_pass == password) {
                             success = true;
                             status = "เข้าสู่ระบบ";
+                            id = data.docId;
                         } else {
                             success = false;
                             status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
+                            id = null;
                         }
                     } else {
                         success = false
                         status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
+                        id = null;
                     }
 
-                    reply( {"success" : success, "status" : status, "docId" : data.docId} );
+                    reply( {"success" : success, "status" : status, "docId" : id} );
                 });
             
             },
