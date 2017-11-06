@@ -45,7 +45,7 @@
                         status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
                     }
 
-                    reply( {"success" : success, "status" : status } );
+                    reply( {"success" : success, "status" : status , "patId" : user} );
                 });
             
             },
@@ -96,7 +96,7 @@
                         status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
                     }
 
-                    reply( {"success" : success, "status" : status } );
+                    reply( {"success" : success, "status" : status, "docId" : user} );
                 });
             
             },
