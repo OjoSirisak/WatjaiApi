@@ -38,12 +38,12 @@
                         } else {
                             success = false;
                             status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
-                            id = null;
+                            id = "";
                         }
                     } else {
                         success = false
                         status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
-                        id = null
+                        id = ""
                     }
 
                     reply( {"success" : success, "status" : status , "patId" : id} );
@@ -91,12 +91,12 @@
                         } else {
                             success = false;
                             status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
-                            id = null;
+                            id = "";
                         }
                     } else {
                         success = false
                         status = "เบอร์โทรศัพท์หรือรหัสผ่านผิด";
-                        id = null;
+                        id = "";
                     }
 
                     reply( {"success" : success, "status" : status, "docId" : id} );
