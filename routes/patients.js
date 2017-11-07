@@ -357,6 +357,29 @@
         }
     });
 
+    server.route({
+        method: 'GET',
+        path: '/patients/{patId}/history',
+        handler: function (request, reply) {
+
+            db.WatjaiMeasure.find({
+                patId: request.params.patId
+            }).sort({ alertTime : -1 } , (err, doc) => {
+                
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+                
+                if (!doc) {
+                    return reply(Boom.notFound());
+                }
+                
+                    reply(doc);
+            });
+
+        }
+    });
+
         return next();
     };
 
