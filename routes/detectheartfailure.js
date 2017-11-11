@@ -874,6 +874,15 @@ exports.register = function (server, options, next) {
                         heart_rate=200.0;
                         reset_5pt_median_filt();
                     }	                
+                }else{
+                    if(heart_rate<30.0){
+                        heart_rate=30.0;
+                    }
+                    if(heart_rate>200.0)
+                    {
+                        heart_rate=200.0;
+                        
+                    }
                 }
     
                 last_fid=fid_pandt;
