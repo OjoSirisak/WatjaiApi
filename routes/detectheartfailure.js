@@ -953,7 +953,7 @@ exports.register = function (server, options, next) {
                     }
                 });
 
-                reply({"status": true});
+                reply(detecting);
             })
         },
         config: {
