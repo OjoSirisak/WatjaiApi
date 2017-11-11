@@ -795,7 +795,7 @@ exports.register = function (server, options, next) {
             if(fid_pandt > 0){
                 fid_pt_pandt_time = time_buff[(fid_pandt)%WIND];
                 rr_int = fid_pt_pandt_time-last_fid_time;
-                if (rr_int != 0) {
+                if (rr_int > 0) {
                     heart_rate = 60.0/rr_int;
                 }
                 
