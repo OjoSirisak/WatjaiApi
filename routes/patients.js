@@ -368,7 +368,7 @@
 
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
-            }).sort({ alertTime : 1 }).limit(10 , (err, doc) => {
+            }).sort({ alertTime : -1 }).limit(10 , (err, doc) => {
                 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
