@@ -363,7 +363,8 @@
         handler: function (request, reply) {
             var getDate;
             getDate = new Date(Date.now());
-            getDate.setUTCHours(getDate.getUTCHours() + 6);
+            getDate.setUTCHours(getDate.getUTCHours() + 7);
+            getDate.setMinutes(getDate.getUTCMinutes() - 10);
 
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
