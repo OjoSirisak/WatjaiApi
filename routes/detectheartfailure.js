@@ -765,18 +765,19 @@ exports.register = function (server, options, next) {
                 
                 return fid;
     }
-    var rrAvg = [];
-    var countBeat = 0;
-    var  rr;
-    var  rrLow;
-    var  rrHigh;
-    var  rrMissed;
-    var recentBeat = [];
-    var count = 0;
-    var nOfBeat = 0;
-    var unnormal_state_count = 0;
-    var result_rate = 0; // for return percent of Arrthymia.
+    
     function get_result(data){
+        var rrAvg = [];
+        var countBeat = 0;
+        var  rr;
+        var  rrLow;
+        var  rrHigh;
+        var  rrMissed;
+        var recentBeat = [];
+        var count = 0;
+        var nOfBeat = 0;
+        var unnormal_state_count = 0;
+        var result_rate = 0; // for return percent of Arrthymia.
         var temp = 0;
         var fid_pandt = 0;
         var time = 0;
