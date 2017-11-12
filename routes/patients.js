@@ -31,7 +31,7 @@
         path: '/patients/{patId}',
         handler: function (request, reply) {
             $match: {patId : request.params.patId}
-            db.Patients.aggregate([{ $lookup: { from: "Doctors", localField: "docId", foreignField: "docId", as: "Doctor"}},{$match: {patId : "PA1709001"}}], 
+            db.Patients.aggregate([{ $lookup: { from: "Doctors", localField: "docId", foreignField: "docId", as: "Doctor"}},{$match: {patId : request.params.patId }}], 
             (err, doc) => {
 
                 if (err) {
