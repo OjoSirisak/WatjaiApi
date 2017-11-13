@@ -8,7 +8,7 @@ exports.register = function (server, options, next) {
 
     const db = server.app.db;
 
-    var samplingFrequency = 360;
+    var samplingFrequency = 160;
     var WIND = 1000;
     var WINDOW = 100;
     var TAVWINDOW = 80;
