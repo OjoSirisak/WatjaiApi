@@ -48,48 +48,51 @@
         }
     });
 
+    function checkId(tmp) {
+        var year, month, day;
+        var number, checkYear, checkMonth, checkDay;
+        var getDate;
+        getDate = new Date(Date.now());
+        getDate.setUTCHours(getDate.getUTCHours() + 7);
+        getDate = getDate.toISOString();
+        getDate = getDate.substr(2, 8);
+        year = getDate.substr(0, 2);
+        month = getDate.substr(3, 2);
+        day = getDate.substr(6, 2);
+
+        if (tmp[0] != null) {
+            var getId = tmp[0].patId + "";
+            var getNumber = getId.substr(2, 11);
+            checkYear = getId.substr(2, 2);
+            checkMonth = getId.substr(4, 2);
+            if (year == checkYear && month == checkMonth) {
+                number = parseInt(getNumber);
+                number = number + 1;
+                return number;
+            } else {
+                return year + month + "001";
+            }
+        } else {
+            return year + month + "001";
+        }
+
+    }
 
     // create patient user
     server.route({
         method: 'POST',
         path: '/patients',
         handler: function (request, reply) {
-            var number, genId, checkYear, checkMonth;
-            var number, genId, checkYear, checkMonth, checkDay;
-            var year, month, day;
-            var getDate;
-            getDate = new Date(Date.now());
-            getDate.setUTCHours(getDate.getUTCHours() + 7);
-            getDate = getDate.toISOString();
-            getDate = getDate.substr(2, 8);
-            year = getDate.substr(0, 2); 
-            month = getDate.substr(3, 2);
-            day = getDate.substr(6, 2);
+           
             db.Patients.find({}, { patId: 1, _id: 0 }).sort({ patId: -1 }).limit(1, (err, result) => {
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
                 }
                 const tmp = result;
-                if (tmp[0] != null) {
-                    var getPatId = tmp[0].patId + "";
-                    var getNumber = getPatId.substr(2, 7);
-                    checkYear = getPatId.substr(2, 2);
-                    checkMonth = getPatId.substr(4, 2);
-                    if (year == checkYear && month == checkMonth) {
-                        number = parseInt(getNumber);
-                        number = number + 1;
-                        genId = "PA" + number;
-                    } else {
-                        genId = "PA" + year + month + "001";
-                    }
-                } else {
-                    genId = "PA" + year + month + "001";
-                }
-
                 const pat = request.payload;
 
                 pat.birthDay = new Date(request.payload.birthDay);
-                pat.patId = genId;
+                pat.patId = "PA" + checkId(tmp);
 
                 db.Patients.save(pat, { unique: true }, (err, result) => {
 
@@ -100,20 +103,12 @@
                     reply(pat);
 
                     db.Doctors.update({ docId: pat.docId}, { $addToSet: {patients:  pat.patId  } }, function (err, result) {
-
                         if (err) {
                             return reply(Boom.wrap(err, 'Internal MongoDB error'));
                         }
-
-                        if (result.n === 0) {
-                            return reply(Boom.notFound());
-                        }
-
                     });
+
                 });
-
-                
-
 
             })
         },
@@ -226,7 +221,7 @@
 
             db.WatjaiNormal.find({
                 patId: request.params.patId
-            }).sort({ measureTime : 1 } , (err, doc) => {
+            }).sort({ measuringTime : 1 } , (err, doc) => {
                 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -249,7 +244,7 @@
 
             db.WatjaiNormal.find({
                 patId: request.params.patId
-            }).sort({ measureTime : -1 } , (err, doc) => {
+            }).sort({ measuringTime : -1 } , (err, doc) => {
                 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -272,7 +267,7 @@
 
             db.WatjaiNormal.find({
                 patId: request.params.patId
-            }).sort({ measureTime : -1 } , (err, doc) => {
+            }).sort({ measuringTime : -1 } , (err, doc) => {
                 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -295,7 +290,7 @@
 
             db.WatjaiMeasure.find({
                 patId: request.params.patId
-            }).sort({ alertTime : 1 } , (err, doc) => {
+            }).sort({ measuringTime : 1 } , (err, doc) => {
                 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -318,7 +313,7 @@
 
             db.WatjaiMeasure.find({
                 patId: request.params.patId
-            }).sort({ alertTime : -1 } , (err, doc) => {
+            }).sort({ measuringTime : -1 } , (err, doc) => {
                 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -341,7 +336,7 @@
 
             db.WatjaiMeasure.find({
                 patId: request.params.patId
-            }).sort({ alertTime : -1 } , (err, doc) => {
+            }).sort({ measuringTime : -1 } , (err, doc) => {
                 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -368,7 +363,7 @@
 
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
-            }).sort({ alertTime : -1 }).limit(10 , (err, doc) => {
+            }).sort({ measuringTime : -1 }).limit(10 , (err, doc) => {
                 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));

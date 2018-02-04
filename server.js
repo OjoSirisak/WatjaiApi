@@ -9,14 +9,14 @@ const mongojs = require('mongojs');
 // Create a server with a host and port
 const server = new Hapi.Server();
 server.connection({
-    //host: 'localhost',
-    host: '128.199.245.253', 
+    host: 'localhost',
+    //host: '128.199.245.253', 
     port: 3000
 });
 
 //Connect to db
-server.app.db = mongojs('project:smartheart@128.199.245.253/Project?authMechanism=SCRAM-SHA-1', ['Doctors','Patients','WatjaiNormal','WatjaiAlert']);
-
+//server.app.db = mongojs('project:smartheart@128.199.245.253/Project?authMechanism=SCRAM-SHA-1', ['Doctors','Patients','WatjaiNormal','WatjaiAlert']);
+server.app.db = mongojs('192.168.80.130/Project', ['Doctors','Patients','WatjaiNormal','WatjaiAlert']);
 //Load plugins and start server
 server.route({
   method: 'GET',

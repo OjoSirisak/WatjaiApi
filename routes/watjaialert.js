@@ -5,6 +5,8 @@ const uuid = require('node-uuid');
 const Joi = require('joi');
 const onesignal = require('node-opensignal-api');
 const onesignal_client = onesignal.createClient();
+const restApiKey = 'NTAwZWM1OWMtZjhjNS00YTc4LTk5OTgtODVjYjNhOGZhNmE4';
+const appId = '3b2a8959-e726-41d4-b83d-82c965cfabe1';
 
 exports.register = function (server, options, next) {
 
@@ -57,7 +59,7 @@ exports.register = function (server, options, next) {
         handler: function (request, reply) {
             db.WatjaiMeasure.find({
                 "abnormalStatus" : false 
-            }).sort({ alertTime : -1 }, (err, docs) => {
+            }).sort({ measuringTime : -1 }, (err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -80,7 +82,7 @@ exports.register = function (server, options, next) {
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
                 "abnormalStatus" : false 
-            }).sort({ alertTime : -1 }, (err, docs) => {
+            }).sort({ measuringTime : -1 }, (err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -102,8 +104,8 @@ exports.register = function (server, options, next) {
         handler: function (request, reply) {
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
-                "comment" : {"$exists" : true, "$ne" : ""}
-            }).sort({ alertTime : -1 }, (err, docs) => {
+                "commentStatus" : false
+            }).sort({ measuringTime : -1 }, (err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -125,9 +127,9 @@ exports.register = function (server, options, next) {
         handler: function (request, reply) {
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
-                "comment" : {"$exists" : true, "$ne" : ""},
+                "commentStatus" : false,
                 "measuringId" : { $gt : request.params.measuringId }
-            }).sort({ alertTime : -1 }, (err, docs) => {
+            }).sort({ measuringTime : -1 }, (err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -145,7 +147,7 @@ exports.register = function (server, options, next) {
 
     server.route({
         method: 'PATCH',
-        path: '/watjaimeasure/{measuringId}',
+        path: '/watjaimeasure/comment/{measuringId}',
         handler: function (request, reply) {
             let patId;
             db.WatjaiMeasure.find({
@@ -163,7 +165,8 @@ exports.register = function (server, options, next) {
                 db.WatjaiMeasure.update({
                     measuringId: request.params.measuringId
                 }, {
-                    $set: request.payload
+                    $set: { commentStatus: true, 
+                            comment : request.payload.comment }
                 }, function (err, result) {
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -173,10 +176,9 @@ exports.register = function (server, options, next) {
                     }
                     reply().code(204);
                 });
-                console.log(patId);
-                var restApiKey = 'NTAwZWM1OWMtZjhjNS00YTc4LTk5OTgtODVjYjNhOGZhNmE4';
+
                 var params = {
-                    app_id: '3b2a8959-e726-41d4-b83d-82c965cfabe1',
+                    app_id: appId,
                     contents: {
                         'en': request.payload.comment,
                         'th': request.payload.comment
@@ -197,24 +199,21 @@ exports.register = function (server, options, next) {
         config: {
             validate: {
                 payload: Joi.object({
-                    abnormalStatus: Joi.boolean(),
-                    comment: Joi.string().min(5),
-                    alertTime: Joi.date(),
-                    readStatus: Joi.string()
+                    comment: Joi.string().min(5)
                 }).required().min(1)
             }
         }
     });
 
     server.route({
-        method: 'PATCH',
+        method: 'GET',
         path: '/watjaimeasure/changereadstatus/{measuringId}',
         handler: function (request, reply) {
 
             db.WatjaiMeasure.update({
                 measuringId: request.params.measuringId
             }, {
-                    $set: request.payload
+                    $set: { readStatus : true }
                 }, function (err, result) {
 
                     if (err) {
@@ -227,54 +226,9 @@ exports.register = function (server, options, next) {
 
                     reply().code(204);
                 });
-        },
-        config: {
-            validate: {
-                payload: Joi.object({
-                    measuringData: Joi.array(),
-                    patId: Joi.string(),
-                    alertTime: Joi.date(),
-                    measuringId: Joi.string(),
-                    heartRate: Joi.number(),
-                    abnormalStatus: Joi.boolean(),
-                    abnormalDetail: Joi.string(),
-                    readStatus: Joi.string(),
-                    comment: Joi.string()
-                }).required().min(1)
-            }
         }
     });
 
-    server.route({
-        method: 'POST',
-        path: '/onesignal',
-        handler: function (request, reply) {
-                var restApiKey = 'MDg1N2FmMWItZTg3Ni00MzllLWFjNjUtYjhkZDI0ODBjOGVj';
-                var params = {
-                    app_id: 'e714205d-ffd3-4182-8dbb-29c68d32ed2a',
-                    contents: {
-                        'en': request.payload.test,
-                        'th': request.payload.test
-                    },
-                    tags: [{ "key": "test_tag", "relation": "=", "value": "tag001"}]
-                };
-                    onesignal_client.notifications.create(restApiKey, params, function (err, response) {
-                        if (err) {
-                            console.log('Encountered error', err);
-                          } else {
-                            console.log(response);
-                            reply({ status : true});
-                          }
-                    });
-        },
-        config: {
-            validate: {
-                payload: Joi.object({
-                    test: Joi.string()
-                })
-            }
-        }
-    });
 
     return next();
 };
