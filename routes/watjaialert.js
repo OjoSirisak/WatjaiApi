@@ -104,7 +104,7 @@ exports.register = function (server, options, next) {
         handler: function (request, reply) {
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
-                "commentStatus" : false
+                "abnormalStatus" : false
             }).sort({ measuringTime : -1 }, (err, docs) => {
 
                 if (err) {
@@ -123,11 +123,34 @@ exports.register = function (server, options, next) {
 
     server.route({
         method: 'GET',
+        path: '/watjaimeasure/getTotalAbnormal/{patId}',
+        handler: function (request, reply) {
+            db.WatjaiMeasure.find({
+                patId: request.params.patId,
+                "abnormalStatus" : false
+            }, (err, docs) => {
+
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+
+                if (!docs) {
+                    return reply(Boom.notFound());
+                }
+
+                reply({ "total" : docs.length });
+            });
+
+        }
+    });
+
+    server.route({
+        method: 'GET',
         path: '/watjaimeasure/showabnormal/{patId}/after/{measuringId}',
         handler: function (request, reply) {
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
-                "commentStatus" : false,
+                "abnormalStatus" : false,
                 "measuringId" : { $gt : request.params.measuringId }
             }).sort({ measuringTime : -1 }, (err, docs) => {
 
@@ -139,7 +162,7 @@ exports.register = function (server, options, next) {
                     return reply(Boom.notFound());
                 }
 
-                reply(docs);
+                reply(notifications);
             });
 
         }
@@ -166,7 +189,8 @@ exports.register = function (server, options, next) {
                     measuringId: request.params.measuringId
                 }, {
                     $set: { commentStatus: true, 
-                            comment : request.payload.comment }
+                            comment : request.payload.comment,
+                            measuringTime: request.payload.measuringTime }
                 }, function (err, result) {
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -183,6 +207,7 @@ exports.register = function (server, options, next) {
                         'en': request.payload.comment,
                         'th': request.payload.comment
                     },
+                    data: { "from": "comment" },
                     tags: [{ "key": "patId", "relation": "=", "value": patId}]
                 };
                 if (request.payload.comment != "") {
@@ -199,7 +224,8 @@ exports.register = function (server, options, next) {
         config: {
             validate: {
                 payload: Joi.object({
-                    comment: Joi.string().min(5)
+                    comment: Joi.string().min(5),
+                    measuringTime: Joi.date()
                 }).required().min(1)
             }
         }

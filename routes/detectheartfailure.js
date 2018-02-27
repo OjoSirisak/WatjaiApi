@@ -6,7 +6,7 @@ const Joi = require('joi');
 const onesignal = require('node-opensignal-api');
 const onesignal_client = onesignal.createClient();
 const restApiKey = 'NTAwZWM1OWMtZjhjNS00YTc4LTk5OTgtODVjYjNhOGZhNmE4';
-const appId = '3b2a8959-e726-41d4-b83d-82c965cfabe1';
+var appId = '3b2a8959-e726-41d4-b83d-82c965cfabe1';
 
 exports.register = function (server, options, next) {
 
@@ -916,7 +916,7 @@ exports.register = function (server, options, next) {
         method: 'POST',
         path: '/watjaimeasure',
         handler: function (request, reply) {
-            var genId;
+            var genId, patientData;
             const measuring = request.payload;
             var date = new Date(Date.now());
             var measuringData = request.payload.measuringData;
@@ -927,7 +927,7 @@ exports.register = function (server, options, next) {
             initialise();
             var detecting = get_result(measuringData);
             measuring.heartRate = parseInt(heart_rate);
-
+            
             if (abnormal_status) {
                 db.WatjaiNormal.find({}, { measuringId: 1, _id: 0 }).sort({ measuringId: -1 }).limit(1, (err, result) => {
 
@@ -946,6 +946,9 @@ exports.register = function (server, options, next) {
             } else {
                 measuring.abnormalStatus = abnormal_status;
                 measuring.abnormalDetail = abnormal_detail;
+                measuring.readStatus = false;
+                measuring.commentStatus = false;
+                measuring.comment = "ตรวจพบภาวะหัวใจเต้นผิดปกติในด้านของ "+abnormal_detail;
                 db.WatjaiMeasure.find({}, { measuringId: 1, _id: 0 }).sort({ measuringId: -1 }).limit(1, (err, result) => {
 
                     if (err) {
@@ -954,31 +957,43 @@ exports.register = function (server, options, next) {
                     const tmp = result;
                     genId = "ME" + checkId(tmp);
                     measuring.measuringId = genId;
-                    measuring.readStatus = false;
-                    measuring.commentStatus = false;
                     db.WatjaiMeasure.save(measuring, (err, result) => {
 
                         if (err) {
                             return reply(Boom.wrap(err, 'Internal MongoDB error'));
                         }
                     });
-                    
-                    var params = {
-                        app_id: appId,
-                        contents: {
-                            'en': 'หัวใจของคุณมีอาการผิดปกติ',
-                            'th': 'หัวใจของคุณมีอาการผิดปกติ'
-                        },
-                        tags: [{ "key": "patId", "relation": "=", "value": request.payload.patId }]
-                    };
-                    onesignal_client.notifications.create(restApiKey, params, function (err, response) {
-                        if (err) {
-                            console.log('Encountered error', err);
-                        } else {
-                            console.log(response);
-                        }
-                    });
 
+                    db.Patients.find({
+                        patId: request.payload.patId
+                    } , (err, patient) => {
+                        
+                        if (err) {
+                            return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                        }
+                        
+                        if (!patient) {
+                            return reply(Boom.notFound());
+                        }
+                        
+                        var params = {
+                            app_id: appId,
+                            contents: {
+                                'en': 'ตรวจพบภาวะหัวใจเต้นผิดปกติ',
+                                'th': 'ตรวจพบภาวะหัวใจเต้นผิดปกติ'
+                            },
+                            data: { "from": "measure","name" : patient[0].relativeName, "tel" : patient[0].relativeTel },
+                            tags: [{ "key": "patId", "relation": "=", "value": request.payload.patId }]
+                        };
+                        onesignal_client.notifications.create(restApiKey, params, function (err, response) {
+                            if (err) {
+                                console.log('Encountered error', err);
+                            } else {
+                                console.log(response);
+                            }
+                        });
+                        
+                    });
 
                     reply({ "status": true, "from": "measure" });
                 });

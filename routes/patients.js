@@ -1,24 +1,24 @@
-    'use strict';
+'use strict';
 
-    const Boom = require('boom');
-    const uuid = require('node-uuid');
-    const Joi = require('joi');
+const Boom = require('boom');
+const uuid = require('node-uuid');
+const Joi = require('joi');
 
-    exports.register = function (server, options, next) {
+exports.register = function (server, options, next) {
 
-        const db = server.app.db;
+    const db = server.app.db;
 
-        server.route({
-        method: 'GET',
-        path: '/patients',
-        handler: function (request, reply) {
+    server.route({
+    method: 'GET',
+    path: '/patients',
+    handler: function (request, reply) {
 
             db.Patients.find((err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
                 }
-                
+                    
                 reply(docs);
             });
 
@@ -128,6 +128,8 @@
                     underlyingDisease: Joi.string().min(2).max(100),
                     docId: Joi.string().min(9).max(9).required(),
                     password: Joi.string().min(3),
+                    relativeName: Joi.string().required(),
+                    relativeTel: Joi.string().min(10).max(10).required(),
                     patPic: Joi.string()
                 }
             }
@@ -356,32 +358,42 @@
         method: 'GET',
         path: '/patients/{patId}/history',
         handler: function (request, reply) {
-            var getDate;
-            getDate = new Date(Date.now());
-            getDate.setUTCHours(getDate.getUTCHours() + 7);
-            getDate.setMinutes(getDate.getUTCMinutes() - 10);
-
-            db.WatjaiMeasure.find({
+            var normals, measures;
+            db.WatjaiNormal.find({
                 patId: request.params.patId,
-            }).sort({ measuringTime : -1 }).limit(10 , (err, doc) => {
-                
+            }).sort({ measuringTime : -1 }).limit(10 , (err, normal) => {
+    
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
                 }
                 
-                if (!doc) {
-                    return reply(Boom.notFound());
-                }
+                normals = normal;
+                db.WatjaiMeasure.find({
+                    patId: request.params.patId,
+                }).sort({ measuringTime : -1 }).limit(10 , (err, measure)=> {
+    
+                    if (err) {
+                        return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                    }
+                            
+                    measures = measure;
+                    const merge = [...normals,...measures];
+                    merge.sort(function(a, b) {
+                        a = new Date(a.measuringTime);
+                        b = new Date(b.measuringTime);
+                        return a>b ? -1 : a<b ? 1 : 0;
+                    });
+                    merge.splice(10, 10);
+                    reply(merge);
+                });
                 
-                    reply(doc);
             });
-
         }
     });
 
-        return next();
-    };
+    return next();
+};
 
-    exports.register.attributes = {
-        name: 'routes-patients'
-    };
+exports.register.attributes = {
+    name: 'routes-patients'
+};
