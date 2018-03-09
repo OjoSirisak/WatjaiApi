@@ -5,7 +5,6 @@ const uuid = require('node-uuid');
 const Joi = require('joi');
 const onesignal = require('node-opensignal-api');
 const onesignal_client = onesignal.createClient();
-const Nexmo = require('nexmo')
 const restApiKey = 'NTAwZWM1OWMtZjhjNS00YTc4LTk5OTgtODVjYjNhOGZhNmE4';
 var appId = '3b2a8959-e726-41d4-b83d-82c965cfabe1';
 
@@ -986,7 +985,7 @@ exports.register = function (server, options, next) {
                             data: { "from": "measure",
                                     "name" : patient[0].relativeName, 
                                     "tel" : patient[0].relativeTel,
-                                    "measuringId" : measuringId },
+                                    "measuringId" : genId },
                             tags: [{ "key": "patId", "relation": "=", "value": request.payload.patId }]
                         };
                         onesignal_client.notifications.create(restApiKey, params, function (err, response) {
