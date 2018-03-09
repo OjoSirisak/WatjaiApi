@@ -8,14 +8,6 @@ const onesignal_client = onesignal.createClient();
 const Nexmo = require('nexmo')
 const restApiKey = 'NTAwZWM1OWMtZjhjNS00YTc4LTk5OTgtODVjYjNhOGZhNmE4';
 var appId = '3b2a8959-e726-41d4-b83d-82c965cfabe1';
-const NEXMO_API_KEY = 'b65ba2b0';
-const NEXMO_API_SECRET = 'HnS8kwFmgBdgeAH3';
-const from = 'วัดใจ';
-
-const nexmo = new Nexmo({
-    apiKey: NEXMO_API_KEY,
-    apiSecret: NEXMO_API_SECRET
-  });
 
 exports.register = function (server, options, next) {
 
@@ -1001,20 +993,6 @@ exports.register = function (server, options, next) {
                                 console.log(response);
                             }
                         });
-
-                        var to = patient[0].relativeTel;
-                        var text = 'ญาติของท่านต้องการขอความช่วยเหลือ เนื่องจากตรวจพบภาวะหัวใจเต้นผิดปกติ';
-
-                        nexmo.message.sendSms(from, to, text, (error, response) => {
-                            if(error) {
-                              throw error;
-                            } else if(response.messages[0].status != '0') {
-                              console.error(response);
-                              throw 'Nexmo returned back a non-zero status';
-                            } else {
-                              console.log(response);
-                            }
-                          });
                         
                     });
 
