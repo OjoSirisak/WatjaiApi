@@ -983,7 +983,10 @@ exports.register = function (server, options, next) {
                                 'en': 'ตรวจพบภาวะหัวใจเต้นผิดปกติ',
                                 'th': 'ตรวจพบภาวะหัวใจเต้นผิดปกติ'
                             },
-                            data: { "from": "measure","name" : patient[0].relativeName, "tel" : patient[0].relativeTel },
+                            data: { "from": "measure",
+                                    "name" : patient[0].relativeName, 
+                                    "tel" : patient[0].relativeTel,
+                                    "measuringId" : measuringId },
                             tags: [{ "key": "patId", "relation": "=", "value": request.payload.patId }]
                         };
                         onesignal_client.notifications.create(restApiKey, params, function (err, response) {
