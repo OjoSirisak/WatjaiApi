@@ -380,7 +380,7 @@ exports.register = function (server, options, next) {
     });
 
     server.route({
-        method: 'GET',
+        method: 'POST',
         path: '/patients/{patId}/allwatjai',
         handler: function (request, reply) {
             var normals, measures;
