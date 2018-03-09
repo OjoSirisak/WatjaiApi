@@ -279,21 +279,27 @@ exports.register = function (server, options, next) {
         method: 'GET',
         path: '/sendingsms/{patId}',
         handler: function (request, reply) {
-            db.Patient.find({
+            db.Patients.find({
                 patId: request.params.patId,
             }, (err, patient) => {
 
-                var to = patient[0].relativeTel;
+                var tel = patient[0].relativeTel;
+                tel = tel.substring(1);
+                var to = '+66' + tel;
                 var text = 'ญาติของท่านต้องการขอความช่วยเหลือ เนื่องจากตรวจพบภาวะหัวใจเต้นผิดปกติ';
 
-                nexmo.message.sendSms(from, to, text, (error, response) => {
+                if (err) {
+                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                }
+
+                nexmo.message.sendSms(from , to, text, {type: "unicode"}, (error, response) => {
                     if (error) {
-                        throw error;
+                        reply(error);
                     } else if (response.messages[0].status != '0') {
                         console.error(response);
                         throw 'Nexmo returned back a non-zero status';
                     } else {
-                        console.log(response);
+                        reply(response);
                     }
                 });
             });
