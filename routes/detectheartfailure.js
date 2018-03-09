@@ -985,7 +985,8 @@ exports.register = function (server, options, next) {
                             data: { "from": "measure",
                                     "name" : patient[0].relativeName, 
                                     "tel" : patient[0].relativeTel,
-                                    "measuringId" : genId },
+                                    "mId" : genId,
+                                    "patId" : patient[0].patId },
                             tags: [{ "key": "patId", "relation": "=", "value": request.payload.patId }]
                         };
                         onesignal_client.notifications.create(restApiKey, params, function (err, response) {
