@@ -127,18 +127,25 @@ exports.register = function (server, options, next) {
         handler: function (request, reply) {
             db.WatjaiMeasure.find({
                 patId: request.params.patId,
-                "abnormalStatus" : false
-            }, (err, docs) => {
+                abnormalStatus : false
+            }, (err, notifications) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
                 }
 
-                if (!docs) {
+                if (!notifications) {
                     return reply(Boom.notFound());
                 }
 
-                reply({ "total" : docs.length });
+                db.WatjaiMeasure.find({
+                    patId: request.params.patId,
+                    readStatus : false
+                }, (err, unReadStatus) => {
+    
+                    reply({ "total" : notifications.length, "unReadStatus" : unReadStatus.length });
+                });
+
             });
 
         }
@@ -188,7 +195,8 @@ exports.register = function (server, options, next) {
                 db.WatjaiMeasure.update({
                     measuringId: request.params.measuringId
                 }, {
-                    $set: { commentStatus: true, 
+                    $set: { commentStatus: true,
+                            readStatus: false,
                             comment : request.payload.comment,
                             measuringTime: request.payload.measuringTime }
                 }, function (err, result) {
