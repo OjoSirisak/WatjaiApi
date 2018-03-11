@@ -418,7 +418,7 @@ exports.register = function (server, options, next) {
         config: {
             validate: {
                 payload: Joi.object({
-                    date: Joi.string().min(10).max(10).required()
+                    date: Joi.string().isoDate()
                 }).required()
             }
         }
