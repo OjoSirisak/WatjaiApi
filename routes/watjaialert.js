@@ -295,11 +295,13 @@ exports.register = function (server, options, next) {
                 nexmo.message.sendSms(from , to, text, {type: "unicode"}, (error, response) => {
                     if (error) {
                         reply(error);
+                        console.log(error);
                     } else if (response.messages[0].status != '0') {
                         console.error(response);
                         throw 'Nexmo returned back a non-zero status';
                     } else {
                         reply(response);
+                        console.log(response);
                     }
                 });
             });
