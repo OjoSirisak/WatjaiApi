@@ -245,7 +245,7 @@ exports.register = function (server, options, next) {
             validate: {
                 payload: Joi.object({
                     comment: Joi.string().min(5),
-                    measuringTime: Joi.isoDate()
+                    measuringTime: Joi.string().isoDate()
                 }).required().min(1)
             }
         }
