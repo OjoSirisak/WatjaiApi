@@ -286,7 +286,7 @@ exports.register = function (server, options, next) {
                 var tel = patient[0].relativeTel;
                 tel = tel.substring(1);
                 var to = '+66' + tel;
-                var text = 'ญาติของท่านต้องการขอความช่วยเหลือ เนื่องจากตรวจพบภาวะหัวใจเต้นผิดปกติ';
+                var text = 'ญาติของ'+ patient[0].patFirstName + ' ต้องการขอความช่วยเหลือ เนื่องจากตรวจพบภาวะหัวใจเต้นผิดปกติ';
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
