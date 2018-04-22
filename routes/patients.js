@@ -380,14 +380,13 @@ exports.register = function (server, options, next) {
     });
 
     server.route({
-        method: 'POST',
+        method: 'GET',
         path: '/patients/{patId}/allwatjai',
         handler: function (request, reply) {
             var normals, measures;
             db.WatjaiNormal.find({
-                patId: request.params.patId,
-                measuringTime : {$gte : request.payload.date }
-            }).sort({ measuringTime : -1 } , (err, normal) => {
+                patId: request.params.patId
+            }).sort({ measuringTime : -1 }).limit(60 , (err, normal) => {
     
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -395,8 +394,8 @@ exports.register = function (server, options, next) {
                 
                 normals = normal;
                 db.WatjaiMeasure.find({
-                    patId: request.params.patId,
-                }).sort({ measuringTime : -1 } , (err, measure)=> {
+                    patId: request.params.patId
+                }).sort({ measuringTime : -1 }).limit(30 , (err, measure)=> {
     
                     if (err) {
                         return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -414,13 +413,6 @@ exports.register = function (server, options, next) {
                 });
                 
             });
-        },
-        config: {
-            validate: {
-                payload: Joi.object({
-                    date: Joi.string().isoDate()
-                }).required()
-            }
         }
     });
 
